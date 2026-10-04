@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Planner</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23dce0e2'/><circle cx='16' cy='16' r='6' fill='%232a3135'/></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><span class="logo"></span>Study Planner</div>
+      <nav class="nav">
+        <button data-view="today" class="active">Today</button>
+        <button data-view="assignments">Assignments</button>
+        <button data-view="courses">Courses</button>
+        <button data-view="insights">Insights</button>
+        <button data-view="settings">Settings</button>
+      </nav>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <div class="content">
+      <header class="header">
+        <div class="topbar">
+          <button class="icon-btn" id="menu-btn" aria-label="Menu">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <nav class="crumbs"><span>Study Planner</span><span class="sep">›</span><span id="crumb">Today</span></nav>
+        </div>
+        <div id="timer-panel" class="timer hidden">
+          <span class="rec"></span>
+          <div class="timer-info">
+            <span class="timer-title" id="timer-title"></span>
+            <span class="timer-goal" id="timer-goal"></span>
+          </div>
+          <span class="timer-clock" id="timer-clock">0:00</span>
+          <div class="timer-actions">
+            <button id="timer-pause" class="op">Pause</button>
+            <button id="timer-stop" class="op">Stop &amp; log</button>
+            <button id="timer-done" class="op">Complete</button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <div id="banner"></div>
+
+        <!-- TODAY -->
+        <section id="view-today" class="view active">
+          <h1 class="page-title">Today</h1>
+          <div class="page-note" id="today-date"></div>
+          <div id="onboarding"></div>
+          <div class="summary">
+            <span class="summary-main" id="today-left"></span>
+            <span class="meter"><span id="today-bar"></span></span>
+            <span class="muted" id="today-progress-label"></span>
+          </div>
+          <div class="muted small" id="today-sub"></div>
+
+          <div id="today-list" class="tree"></div>
+
+          <h2>Coming up</h2>
+          <div id="upcoming" class="tree"></div>
+        </section>
+
+        <!-- ASSIGNMENTS -->
+        <section id="view-assignments" class="view">
+          <h1 class="page-title">Assignments</h1>
+          <div class="page-note">Open assignments, soonest due first. Hover over one for options.</div>
+          <div id="assignment-list" class="tree"></div>
+          <button class="add-row" data-add><span class="plus">+</span>Add assignment</button>
+          <div id="completed-list" class="tree completed-tree"></div>
+        </section>
+
+        <!-- COURSES -->
+        <section id="view-courses" class="view">
+          <h1 class="page-title">Courses</h1>
+          <div class="page-note">Click a name to rename it, or click its dot to change the color.</div>
+          <div id="course-list" class="tree"></div>
+          <form id="course-form" class="add-row course-add">
+            <span class="bullet swatch-wrap"><input id="course-color" class="swatch" type="color" value="#4f7cff" title="Color" /></span>
+            <input id="course-name" class="inline-input" placeholder="Add a course, e.g. BIO 201" autocomplete="off" required />
+            <button class="op">Add</button>
+          </form>
+        </section>
+
+        <!-- INSIGHTS -->
+        <section id="view-insights" class="view">
+          <h1 class="page-title">Insights</h1>
+          <div class="page-note">The planner compares its estimates with the time things really took you, and with the times you type in when you change an estimate. It uses that to adjust future estimates for each kind of work and each course. When you finish an assignment, its real time replaces your correction.</div>
+          <div id="insights" class="tree"></div>
+          <h2>Learned from</h2>
+          <div id="history" class="tree"></div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="view-settings" class="view">
+          <h1 class="page-title">Settings</h1>
+          <div class="page-note">Changes apply to your plan as soon as you save.</div>
+          <form id="settings-form" class="settings">
+            <h2>Time estimates</h2>
+            <label class="choice"><input type="radio" name="estimator" value="local" />
+              <span><span class="setting-name">Built-in</span><span class="setting-desc">Free and instant. Calculates time from word counts, pages, problems, sources and so on in the instructions. Works offline.</span></span>
+            </label>
+            <label class="choice"><input type="radio" name="estimator" value="claude" />
+              <span><span class="setting-name">Claude AI</span><span class="setting-desc">Better at reading unusual instructions. Needs an Anthropic API key and costs a fraction of a cent per estimate.</span></span>
+            </label>
+            <label class="choice"><input type="radio" name="estimator" value="gemini" />
+              <span><span class="setting-name">Gemini AI</span><span class="setting-desc">Also reads unusual instructions well. Needs a Gemini API key from Google AI Studio, which has a free tier.</span></span>
+            </label>
+            <label class="setting" id="key-row">
+              <span><span class="setting-name">Anthropic API key</span><span class="setting-desc" id="key-status"></span></span>
+              <input id="set-key" type="password" autocomplete="off" placeholder="sk-ant-..." />
+            </label>
+            <label class="setting" id="gemini-key-row">
+              <span><span class="setting-name">Gemini API key</span><span class="setting-desc" id="gemini-key-status"></span></span>
+              <input id="set-gemini-key" type="password" autocomplete="off" placeholder="AIza..." />
+            </label>
+
+            <h2>Schedule</h2>
+            <label class="setting">
+              <span><span class="setting-name">Daily maximum</span><span class="setting-desc">Most hours of study to plan for one day.</span></span>
+              <input id="set-cap" type="number" min="0.5" step="0.5" />
+            </label>
+            <label class="setting">
+              <span><span class="setting-name">Finish early by</span><span class="setting-desc">Days before the due date to have each assignment done.</span></span>
+              <input id="set-buffer" type="number" min="0" max="14" step="1" />
+            </label>
+            <div class="setting">
+              <span><span class="setting-name">Study days</span><span class="setting-desc">Days the planner can schedule work on.</span></span>
+              <div class="days" id="set-days"></div>
+            </div>
+            <div class="row end"><button class="btn primary">Save settings</button></div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add / edit assignment -->
+  <dialog id="assignment-dialog">
+    <form id="assignment-form" method="dialog" class="form">
+      <div class="dialog-head" id="assignment-dialog-title">Add assignment</div>
+      <input id="a-title" class="title-input" placeholder="Untitled assignment" autocomplete="off" required />
+      <div class="props">
+        <label class="prop"><span>Course</span><select id="a-course"></select></label>
+        <label class="prop"><span>Due</span><input id="a-due" type="datetime-local" required /></label>
+        <label class="prop"><span>Type</span><select id="a-type"></select></label>
+        <label class="prop"><span>Time needed</span><span class="with-unit"><input id="a-minutes" type="number" min="5" step="5" placeholder="Empty" /><span class="muted">min</span></span></label>
+      </div>
+      <label class="check"><input type="checkbox" id="a-custom" /> Set the time myself (don't estimate)</label>
+      <label class="field">
+        <span>Instructions <span class="muted">(paste the whole thing from Canvas)</span></span>
+        <textarea id="a-instructions" rows="7" placeholder="Paste the full assignment description here..."></textarea>
+      </label>
+
+      <div id="estimate-box" class="estimate hidden"></div>
+
+      <div class="error" id="a-error"></div>
+      <div class="row end">
+        <button type="button" class="btn" id="a-cancel">Cancel</button>
+        <button type="button" class="btn" id="a-estimate">Estimate</button>
+        <button type="submit" class="btn primary" id="a-save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Finish assignment -->
+  <dialog id="done-dialog">
+    <form id="done-form" method="dialog" class="form">
+      <div class="dialog-head">Mark as complete</div>
+      <p id="done-text"></p>
+      <label class="field"><span>Total time you spent on it (minutes)</span>
+        <input id="done-minutes" type="number" min="1" step="1" required />
+      </label>
+      <p class="muted small">This is how the planner learns your pace, so be honest. Include time from earlier sessions.</p>
+      <div class="row end">
+        <button type="button" class="btn" id="done-cancel">Cancel</button>
+        <button type="submit" class="btn primary">Complete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
